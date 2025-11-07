@@ -7,10 +7,17 @@ import (
 	v1 "github.com/orzkratos/demokratos/demo2kratos/api/helloworld/v1"
 	"github.com/orzkratos/demokratos/demo2kratos/internal/conf"
 	"github.com/orzkratos/demokratos/demo2kratos/internal/service"
+	"github.com/orzkratos/pingkratos/clientpingkratos"
+	"github.com/orzkratos/pingkratos/serverpingkratos"
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *http.Server {
+func NewHTTPServer(
+	c *conf.Server,
+	greeter *service.GreeterService,
+	pingService *serverpingkratos.PingService,
+	logger log.Logger,
+) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -27,5 +34,6 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 	}
 	srv := http.NewServer(opts...)
 	v1.RegisterGreeterHTTPServer(srv, greeter)
+	clientpingkratos.RegisterPingHTTPServer(srv, pingService)
 	return srv
 }

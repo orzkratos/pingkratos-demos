@@ -13,6 +13,7 @@ import (
 	"github.com/orzkratos/demokratos/demo2kratos/internal/data"
 	"github.com/orzkratos/demokratos/demo2kratos/internal/server"
 	"github.com/orzkratos/demokratos/demo2kratos/internal/service"
+	"github.com/orzkratos/pingkratos/serverpingkratos"
 )
 
 // Injectors from wire.go:
@@ -26,8 +27,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	greeterRepo := data.NewGreeterRepo(dataData, logger)
 	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
 	greeterService := service.NewGreeterService(greeterUsecase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
+	pingService := serverpingkratos.NewPingService(logger)
+	grpcServer := server.NewGRPCServer(confServer, greeterService, pingService, logger)
+	httpServer := server.NewHTTPServer(confServer, greeterService, pingService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
